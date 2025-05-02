@@ -27,12 +27,25 @@
         </div>
 
         <div class="controls" id="cameraControls" style="display: none;">
+            <div class="filter-options">
+                <h3>Choose a Filter</h3>
+                <div class="filter-selector" id="filterSelector">
+                    <div class="filter-option selected" data-filter="normal">Normal</div>
+                    <div class="filter-option" data-filter="grayscale">B&W</div>
+                    <div class="filter-option" data-filter="sepia">Sepia</div>
+                    <div class="filter-option" data-filter="vintage">Vintage</div>
+                    <div class="filter-option" data-filter="sketch">Sketch</div>
+                </div>
+            </div>
             <button id="captureButton">Take Photos</button>
         </div>
 
         <div class="photostrip-container" id="photostripContainer">
-            <div class="photostrip" id="photostrip">
-                <div class="photostrip-branding">Retro Photobooth - April 28, 2025</div>
+            <div class="machine">
+                <div class="slot"></div>
+                <div class="photostrip" id="photostrip">
+                    <div class="photostrip-branding">Retro Photobooth - April 28, 2025</div>
+                </div>
             </div>
 
             <div class="editor-tools">
