@@ -1,45 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
   // DOM Elements
   const curtain = document.getElementById("curtain");
-
-  if (curtain) {
-    const frames = [
-      "assets/curtain1.svg",
-      "assets/curtain2.svg",
-      "assets/curtain3.svg",
-      "assets/curtain4.svg",
-    ];
-
-    let interval = 0;
-
-    function animateCurtain(forward = true) {
-      let index = forward ? 0 : frames.length - 1;
-      clearInterval(interval);
-      interval = setInterval(() => {
-        curtain.src = frames[index];
-        index = forward ? index + 1 : index - 1;
-        if (index < 0 || index >= frames.length) clearInterval(interval);
-      }, 100);
-    }
-
-    curtain.addEventListener("mouseenter", () => animateCurtain(true));
-    curtain.addEventListener("mouseleave", () => animateCurtain(false));
-
-    // 👉 Navigate to photobooth.html on click
-    curtain.addEventListener("click", () => {
-      window.location.href = "photobooth.html";
-    });
-  } else {
-    console.error("Curtain element not found!");
-  }
-
-  // back to home button
-  const homeButton = document.getElementById("home");
-  if (homeButton) {
-    homeButton.addEventListener("click", () => {
-      window.location.href = "index.html";
-    });
-  }
+  const appInterior = document.getElementById("appInterior");
+  const exitBoothButton = document.getElementById("exitBoothButton");
 
   const startScreen = document.getElementById("startScreen");
   const cameraContainer = document.getElementById("cameraContainer");
@@ -64,15 +27,99 @@ document.addEventListener("DOMContentLoaded", () => {
   let photoElements = [];
   let isCountingDown = false;
 
-  // Start the photobooth
+  // Check if elements exist before adding event listeners
+  if (curtain) {
+    curtain.addEventListener("click", enterBooth);
+
+    const frames = [
+      "/assets/curtain1.svg",
+      "/assets/curtain2.svg",
+      "/assets/curtain3.svg",
+      "/assets/curtain4.svg",
+    ];
+
+    let interval = null;
+
+    function animateCurtain(forward = true) {
+      let index = forward ? 0 : frames.length - 1;
+
+      clearInterval(interval);
+      interval = setInterval(() => {
+        curtain.src = frames[index];
+
+        if (forward) {
+          index++;
+          if (index >= frames.length) clearInterval(interval);
+        } else {
+          index--;
+          if (index < 0) clearInterval(interval);
+        }
+      }, 100); // change frame every 100ms
+    }
+
+    curtain.addEventListener("mouseenter", () => animateCurtain(true));
+    curtain.addEventListener("mouseleave", () => animateCurtain(false));
+  }
+
+  // Exit button event listener
+  if (exitBoothButton) {
+    exitBoothButton.addEventListener("click", exitBooth);
+  }
+
+  // Start button event listener
   if (startButton) {
-    startButton.addEventListener("click", initCamera);
+    console.log("Adding event listener to Start button");
+    startButton.addEventListener("click", function () {
+      console.log("Start button clicked");
+      initCamera();
+    });
+  } else {
+    console.error("Start button not found");
+  }
+
+  // Enter the photobooth
+  function enterBooth() {
+    const photoboothExterior = document.querySelector(".photobooth-exterior");
+    photoboothExterior.classList.add("fade-out");
+
+    setTimeout(() => {
+      photoboothExterior.style.display = "none";
+      appInterior.style.display = "block";
+
+      // Allow time for DOM update before adding the fade-in class
+      setTimeout(() => {
+        appInterior.classList.add("fade-in");
+      }, 50);
+    }, 800);
+  }
+
+  // Exit the photobooth
+  function exitBooth() {
+    const photoboothExterior = document.querySelector(".photobooth-exterior");
+    appInterior.classList.remove("fade-in");
+    appInterior.classList.add("fade-out");
+
+    setTimeout(() => {
+      appInterior.style.display = "none";
+      photoboothExterior.style.display = "flex";
+      photoboothExterior.classList.remove("fade-out");
+
+      // Reset the photobooth if needed
+      if (photostripContainer.style.display === "flex") {
+        resetPhotobooth();
+      }
+    }, 800);
   }
 
   // Initialize the camera
   async function initCamera() {
-    startScreen.style.display = "none";
-    cameraContainer.style.display = "block";
+    console.log("Initializing camera");
+    if (startScreen) {
+      startScreen.style.display = "none";
+    }
+    if (cameraContainer) {
+      cameraContainer.style.display = "block";
+    }
 
     try {
       stream = await navigator.mediaDevices.getUserMedia({
@@ -85,11 +132,24 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       camera.srcObject = stream;
-      loadingMessage.style.display = "none";
-      cameraControls.style.display = "flex";
-      captureButton.addEventListener("click", startPhotoSequence);
+
+      if (loadingMessage) {
+        loadingMessage.style.display = "none";
+      }
+
+      if (cameraControls) {
+        cameraControls.style.display = "flex";
+
+        if (captureButton && !captureButton._hasClickListener) {
+          captureButton.addEventListener("click", startPhotoSequence);
+          captureButton._hasClickListener = true; // Mark that we added the listener
+          console.log("Added click listener to capture button");
+        }
+      }
     } catch (err) {
-      loadingMessage.textContent = "Camera access denied or not available :(";
+      if (loadingMessage) {
+        loadingMessage.textContent = "Camera access denied or not available :(";
+      }
       console.error("Error accessing camera:", err);
     }
   }
@@ -97,7 +157,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Start the photo taking sequence
   function startPhotoSequence() {
     if (isCountingDown) return;
-
+    console.log("Starting photo sequence");
     isCountingDown = true;
     captureButton.disabled = true;
     startCountdown();
@@ -178,103 +238,49 @@ document.addEventListener("DOMContentLoaded", () => {
     cameraContainer.style.display = "none";
     cameraControls.style.display = "none";
 
-    // Show printing overlay
-    const printingOverlay = document.createElement("div");
-    printingOverlay.className = "printing-overlay active";
-
-    const printingMessage = document.createElement("div");
-    printingMessage.className = "printing-message";
-    printingMessage.textContent = "Printing your photos...";
-
-    printingOverlay.appendChild(printingMessage);
-    document.body.appendChild(printingOverlay);
-
-    // Play printer sound
-    const printerSound = document.getElementById("printerSound");
-    if (printerSound) {
-      printerSound.play();
-    } else {
-      // Fallback if the element doesn't exist in HTML
-      const audioElement = document.createElement("audio");
-      audioElement.className = "printer-sound";
-      audioElement.src = "assets/printer-sound.mp3";
-      audioElement.autoplay = true;
-      document.body.appendChild(audioElement);
+    // Add photos to photostrip
+    for (let i = 0; i < photoElements.length; i++) {
+      photostrip.appendChild(photoElements[i]);
     }
 
-    // Show photostrip container
+    // Show photostrip editor
     photostripContainer.style.display = "flex";
 
-    // Add the printing class to photostrip
-    photostrip.classList.add("printing");
-
-    // Add printing class to branding
-    const branding = photostrip.querySelector(".photostrip-branding");
-    if (branding) {
-      branding.classList.add("printing");
-    }
-
-    // Add photos to photostrip with a delay for the animation
-    setTimeout(() => {
-      for (let i = 0; i < photoElements.length; i++) {
-        photostrip.appendChild(photoElements[i]);
-      }
-
-      // Remove the overlay after the animation completes
-      setTimeout(() => {
-        printingOverlay.classList.remove("active");
-        setTimeout(() => {
-          printingOverlay.remove();
-          if (document.querySelector(".printer-sound")) {
-            document.querySelector(".printer-sound").remove();
-          }
-        }, 500);
-      }, 3200); // slightly longer than our animation
-
-      // Initialize the editing tools
-      initEditingTools();
-    }, 300);
+    // Initialize the editing tools
+    initEditingTools();
   }
 
   // Initialize editing tools for photostrip
   function initEditingTools() {
     // Color picker functionality
-    if (colorPicker) {
-      colorPicker.querySelectorAll(".color").forEach((colorEl) => {
-        colorEl.addEventListener("click", () => {
-          // Remove selected class from all colors
-          colorPicker.querySelectorAll(".color").forEach((el) => {
-            el.classList.remove("selected");
-          });
-
-          // Add selected class to clicked color
-          colorEl.classList.add("selected");
-
-          // Apply color to photostrip
-          const selectedColor = colorEl.getAttribute("data-color");
-          photostrip.style.backgroundColor = selectedColor;
+    colorPicker.querySelectorAll(".color").forEach((colorEl) => {
+      colorEl.addEventListener("click", () => {
+        // Remove selected class from all colors
+        colorPicker.querySelectorAll(".color").forEach((el) => {
+          el.classList.remove("selected");
         });
+
+        // Add selected class to clicked color
+        colorEl.classList.add("selected");
+
+        // Apply color to photostrip
+        const selectedColor = colorEl.getAttribute("data-color");
+        photostrip.style.backgroundColor = selectedColor;
       });
-    }
+    });
 
     // Sticker functionality
-    if (stickerPicker) {
-      stickerPicker.querySelectorAll(".sticker").forEach((stickerEl) => {
-        stickerEl.addEventListener("click", () => {
-          addSticker(stickerEl.textContent);
-        });
+    stickerPicker.querySelectorAll(".sticker").forEach((stickerEl) => {
+      stickerEl.addEventListener("click", () => {
+        addSticker(stickerEl.textContent);
       });
-    }
+    });
 
     // Download button
-    if (downloadButton) {
-      downloadButton.addEventListener("click", downloadPhotostrip);
-    }
+    downloadButton.addEventListener("click", downloadPhotostrip);
 
     // Reset button
-    if (resetButton) {
-      resetButton.addEventListener("click", resetPhotobooth);
-    }
+    resetButton.addEventListener("click", resetPhotobooth);
   }
 
   // Add a draggable sticker to the photostrip
@@ -349,15 +355,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Download the photostrip
   function downloadPhotostrip() {
-    // Remove printing class if it exists
-    photostrip.classList.remove("printing");
-
-    // Get all stickers to make sure they're included in the download
-    const stickers = photostrip.querySelectorAll(".draggable-sticker");
-    stickers.forEach((sticker) => {
-      sticker.style.position = "absolute"; // Ensure position is maintained in screenshot
-    });
-
     html2canvas(photostrip).then((canvas) => {
       const link = document.createElement("a");
       link.download = "retro-photostrip.jpg";
@@ -378,13 +375,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     photos.forEach((photo) => photo.remove());
     stickers.forEach((sticker) => sticker.remove());
-
-    // Remove printing classes
-    photostrip.classList.remove("printing");
-    const branding = photostrip.querySelector(".photostrip-branding");
-    if (branding) {
-      branding.classList.remove("printing");
-    }
 
     // Reset photostrip color
     photostrip.style.backgroundColor = "white";

@@ -1,0 +1,413 @@
+body {
+font-family: 'Arial', sans-serif;
+background-color: #f0f0f0;
+margin: 0;
+padding: 0;
+display: flex;
+flex-direction: column;
+align-items: center;
+min-height: 100vh;
+background-image: linear-gradient(to bottom, #e74c3c, #c0392b);
+color: white;
+text-align: center;
+}
+
+h1 {
+font-family: 'Impact', sans-serif;
+letter-spacing: 2px;
+font-size: 2.5rem;
+text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.3);
+margin-bottom: 5px;
+}
+
+.container {
+max-width: 800px;
+width: 95%;
+background-color: #333;
+border-radius: 15px;
+padding: 20px;
+box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+margin: 20px 0;
+border: 10px solid #222;
+position: relative;
+}
+
+/* Photobooth Exterior Styling */
+.photobooth-exterior {
+width: 100%;
+height: 500px;
+position: relative;
+display: flex;
+flex-direction: column;
+background-color: #222;
+border-radius: 8px;
+overflow: hidden;
+}
+
+.booth-top {
+height: 80px;
+background-color: #1a1a1a;
+display: flex;
+justify-content: center;
+align-items: center;
+border-bottom: 4px solid #c0392b;
+}
+
+.booth-sign {
+background-color: #e74c3c;
+color: white;
+padding: 10px 30px;
+border-radius: 5px;
+font-family: 'Impact', sans-serif;
+letter-spacing: 2px;
+font-size: 1.5rem;
+box-shadow: 0 0 15px rgba(231, 76, 60, 0.8);
+border: 2px solid #fff;
+animation: glow 2s infinite alternate;
+}
+
+@keyframes glow {
+from {
+box-shadow: 0 0 10px rgba(231, 76, 60, 0.8);
+}
+to {
+box-shadow: 0 0 20px rgba(231, 76, 60, 1), 0 0 30px rgba(231, 76, 60, 0.8);
+}
+}
+
+.booth-curtain {
+position: absolute;
+height: 340px;
+width: 35%;
+top: 80px;
+background-image: linear-gradient(to bottom, #8e44ad, #9b59b6);
+border: 2px solid #7d3c98;
+}
+
+.booth-curtain::before {
+content: '';
+position: absolute;
+top: 0;
+width: 100%;
+height: 100%;
+background: repeating-linear-gradient(
+0deg,
+rgba(0, 0, 0, 0.1),
+rgba(0, 0, 0, 0.1) 10px,
+rgba(0, 0, 0, 0) 10px,
+rgba(0, 0, 0, 0) 20px
+);
+}
+
+.booth-curtain.left {
+left: 0;
+border-right: 10px solid #7d3c98;
+border-top-right-radius: 50px;
+transform-origin: left;
+animation: curtainWave 5s ease-in-out infinite alternate;
+}
+
+.booth-curtain.right {
+right: 0;
+border-left: 10px solid #7d3c98;
+border-top-left-radius: 50px;
+transform-origin: right;
+animation: curtainWave 5s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes curtainWave {
+0% {
+transform: skewY(2deg);
+}
+100% {
+transform: skewY(-2deg);
+}
+}
+
+.booth-entrance {
+height: 340px;
+margin: 0 auto;
+width: 30%;
+background-color: #111;
+position: absolute;
+top: 80px;
+left: 50%;
+transform: translateX(-50%);
+display: flex;
+justify-content: center;
+align-items: center;
+border-left: 6px solid #7d3c98;
+border-right: 6px solid #7d3c98;
+}
+
+.booth-base {
+height: 80px;
+background-color: #1a1a1a;
+position: absolute;
+bottom: 0;
+width: 100%;
+border-top: 4px solid #c0392b;
+}
+
+#enterBoothButton {
+background-color: #e74c3c;
+color: white;
+padding: 15px 30px;
+border: none;
+border-radius: 30px;
+font-size: 18px;
+cursor: pointer;
+box-shadow: 0 0 20px rgba(231, 76, 60, 0.9);
+transition: all 0.3s ease;
+animation: pulse 1.5s infinite alternate;
+}
+
+#enterBoothButton:hover {
+transform: scale(1.1);
+background-color: #c0392b;
+}
+
+@keyframes pulse {
+0% {
+transform: scale(1);
+}
+100% {
+transform: scale(1.05);
+}
+}
+
+/* Original CSS continues here */
+.start-screen {
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+height: 400px;
+}
+
+.camera-container {
+position: relative;
+margin: 0 auto;
+width: 100%;
+max-width: 640px;
+border-radius: 8px;
+overflow: hidden;
+display: none;
+}
+
+#camera {
+width: 100%;
+height: auto;
+background-color: #222;
+border-radius: 8px;
+transform: scaleX(-1);
+}
+
+.controls {
+margin-top: 20px;
+display: flex;
+justify-content: center;
+flex-wrap: wrap;
+gap: 10px;
+}
+
+button {
+background-color: #e74c3c;
+color: white;
+border: none;
+padding: 12px 24px;
+font-size: 16px;
+border-radius: 30px;
+cursor: pointer;
+transition: all 0.3s;
+font-weight: bold;
+box-shadow: 0 4px 0 #c0392b;
+text-transform: uppercase;
+}
+
+button:hover {
+background-color: #c0392b;
+box-shadow: 0 2px 0 #9e2a1e;
+transform: translateY(2px);
+}
+
+button:active {
+transform: translateY(4px);
+box-shadow: none;
+}
+
+button:disabled {
+background-color: #999;
+box-shadow: none;
+cursor: not-allowed;
+}
+
+.countdown {
+position: absolute;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+font-size: 8rem;
+color: white;
+text-shadow: 0 0 10px #000;
+opacity: 0.8;
+display: none;
+}
+
+.flash {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background-color: white;
+opacity: 0;
+transition: opacity 0.1s;
+}
+
+.photostrip-container {
+display: none;
+flex-direction: column;
+align-items: center;
+width: 100%;
+}
+
+.photostrip {
+display: flex;
+flex-direction: column;
+gap: 10px;
+background-color: white;
+padding: 20px;
+width: 240px;
+border-radius: 5px;
+box-shadow: 0 0 10px rgba(0,0,0,0.5);
+margin-bottom: 20px;
+position: relative;
+}
+
+.photostrip img {
+width: 100%;
+height: auto;
+border: 1px solid #ddd;
+}
+
+.photostrip-branding {
+color: #333;
+font-size: 12px;
+margin-top: 10px;
+text-align: center;
+font-family: 'Courier New', monospace;
+}
+
+.editor-tools {
+display: flex;
+flex-wrap: wrap;
+justify-content: center;
+gap: 10px;
+margin-top: 20px;
+width: 100%;
+}
+
+.color-picker {
+display: flex;
+flex-wrap: wrap;
+justify-content: center;
+gap: 5px;
+margin-bottom: 15px;
+}
+
+.color {
+width: 30px;
+height: 30px;
+border-radius: 50%;
+cursor: pointer;
+border: 2px solid transparent;
+transition: transform 0.2s;
+}
+
+.color:hover {
+transform: scale(1.2);
+}
+
+.color.selected {
+border: 2px solid white;
+box-shadow: 0 0 5px rgba(0,0,0,0.5);
+}
+
+.stickers {
+display: flex;
+flex-wrap: wrap;
+justify-content: center;
+gap: 10px;
+margin-bottom: 15px;
+}
+
+.sticker {
+font-size: 24px;
+cursor: pointer;
+background-color: rgba(255, 255, 255, 0.2);
+border-radius: 5px;
+padding: 5px;
+transition: transform 0.2s;
+}
+
+.sticker:hover {
+transform: scale(1.2);
+}
+
+.draggable-sticker {
+position: absolute;
+cursor: move;
+user-select: none;
+font-size: 24px;
+}
+
+.retro-light {
+position: absolute;
+width: 10px;
+height: 10px;
+background-color: #2ecc71;
+border-radius: 50%;
+top: 20px;
+right: 20px;
+box-shadow: 0 0 10px #2ecc71;
+animation: blink 2s infinite;
+}
+
+@keyframes blink {
+0%, 100% { opacity: 1; }
+50% { opacity: 0.4; }
+}
+
+.loading-message {
+font-size: 1.2rem;
+margin-bottom: 20px;
+animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+0%, 100% { opacity: 1; }
+50% { opacity: 0.5; }
+}
+
+#copyright {
+margin-top: 20px;
+font-size: 12px;
+opacity: 0.7;
+}
+
+/* Transition Animation */
+.app-interior,
+.photobooth-exterior {
+transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.fade-out {
+opacity: 0;
+transform: scale(0.9);
+}
+
+.fade-in {
+opacity: 1;
+transform: scale(1);
+}

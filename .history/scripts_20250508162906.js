@@ -64,6 +64,40 @@ document.addEventListener("DOMContentLoaded", () => {
   let photoElements = [];
   let isCountingDown = false;
 
+  // Create preview container
+  const previewContainer = document.createElement("div");
+  previewContainer.id = "previewContainer";
+  previewContainer.className = "preview-container";
+
+  // Create a confirmation button for the preview
+  const confirmButton = document.createElement("button");
+  confirmButton.id = "confirmButton";
+  confirmButton.textContent = "Keep Photo";
+  confirmButton.className = "confirm-button";
+
+  // Create a retake button for the preview
+  const retakeButton = document.createElement("button");
+  retakeButton.id = "retakeButton";
+  retakeButton.textContent = "Retake";
+  retakeButton.className = "retake-button";
+
+  // Create a container for the preview buttons
+  const previewButtonsContainer = document.createElement("div");
+  previewButtonsContainer.className = "preview-buttons-container";
+  previewButtonsContainer.appendChild(retakeButton);
+  previewButtonsContainer.appendChild(confirmButton);
+
+  // Append to the preview container
+  previewContainer.appendChild(previewButtonsContainer);
+
+  // Insert after camera container
+  if (cameraContainer && cameraContainer.parentNode) {
+    cameraContainer.parentNode.insertBefore(
+      previewContainer,
+      cameraContainer.nextSibling
+    );
+  }
+
   // Start the photobooth
   if (startButton) {
     startButton.addEventListener("click", initCamera);
@@ -73,6 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function initCamera() {
     startScreen.style.display = "none";
     cameraContainer.style.display = "block";
+    previewContainer.style.display = "none";
 
     try {
       stream = await navigator.mediaDevices.getUserMedia({
@@ -146,24 +181,70 @@ document.addEventListener("DOMContentLoaded", () => {
     // Convert canvas to image
     const imgUrl = canvas.toDataURL("image/jpeg");
 
-    // Add to photostrip
-    photosTaken++;
-    const photoElement = document.createElement("img");
-    photoElement.src = imgUrl;
-    photoElement.alt = `Photo ${photosTaken}`;
-    photoElements.push(photoElement);
+    // Show the preview
+    showPhotoPreview(imgUrl);
+  }
 
-    // Check if we need to take more photos
-    if (photosTaken < maxPhotos) {
-      // Wait before next photo
-      setTimeout(() => {
-        isCountingDown = false;
-        startCountdown();
-      }, 1000);
-    } else {
-      // We're done taking photos
-      finishPhotoSession();
+  // Show photo preview and confirmation
+  function showPhotoPreview(imgUrl) {
+    // Hide camera container and show preview
+    cameraContainer.style.display = "none";
+    cameraControls.style.display = "none";
+    previewContainer.style.display = "block";
+
+    // Remove any existing preview image
+    const existingPreview = previewContainer.querySelector(".preview-image");
+    if (existingPreview) {
+      existingPreview.remove();
     }
+
+    // Create preview image
+    const previewImage = document.createElement("img");
+    previewImage.src = imgUrl;
+    previewImage.className = "preview-image";
+    previewImage.alt = `Preview of Photo ${photosTaken + 1}`;
+
+    // Add photo counter
+    const photoCounter = document.createElement("div");
+    photoCounter.className = "photo-counter";
+    photoCounter.textContent = `Photo ${photosTaken + 1} of ${maxPhotos}`;
+
+    // Insert the preview image before the buttons container
+    previewContainer.insertBefore(previewImage, previewButtonsContainer);
+    previewContainer.insertBefore(photoCounter, previewButtonsContainer);
+
+    // Set up confirm button action
+    confirmButton.onclick = () => {
+      // Add to photoElements array
+      const photoElement = document.createElement("img");
+      photoElement.src = imgUrl;
+      photoElement.alt = `Photo ${photosTaken + 1}`;
+      photoElements.push(photoElement);
+      photosTaken++;
+
+      // Check if we need to take more photos
+      if (photosTaken < maxPhotos) {
+        // Continue to next photo
+        previewContainer.style.display = "none";
+        cameraContainer.style.display = "block";
+        cameraControls.style.display = "flex";
+        isCountingDown = false;
+        captureButton.disabled = false;
+      } else {
+        // We're done taking photos
+        finishPhotoSession();
+      }
+    };
+
+    // Set up retake button action
+    retakeButton.onclick = () => {
+      // Go back to camera view
+      previewContainer.style.display = "none";
+      cameraContainer.style.display = "block";
+      cameraControls.style.display = "flex";
+      isCountingDown = false;
+      captureButton.disabled = false;
+    };
   }
 
   // Finish photo session and show the photostrip
@@ -174,9 +255,10 @@ document.addEventListener("DOMContentLoaded", () => {
       stream = null;
     }
 
-    // Hide camera UI
+    // Hide camera UI and preview
     cameraContainer.style.display = "none";
     cameraControls.style.display = "none";
+    previewContainer.style.display = "none";
 
     // Show printing overlay
     const printingOverlay = document.createElement("div");
@@ -395,6 +477,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Hide photostrip and show start screen
     photostripContainer.style.display = "none";
+    previewContainer.style.display = "none";
     startScreen.style.display = "flex";
 
     // Reset buttons

@@ -1,11 +1,16 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 
 
 body {
-  font-family: 'titan-one-regular', sans-serif;
+  font-family: 'Arial', sans-serif;
   background-color: #f0f0f0;
   margin: 0;
   padding: 0;
-  padding-bottom: 80px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -16,13 +21,12 @@ body {
 }
 
 h1 {
-  font-family: 'titan-one-regular', sans-serif;
+  font-family: 'Impact', sans-serif;
   letter-spacing: 2px;
   font-size: 2.5rem;
   text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.3);
   margin-bottom: 5px;
 }
-
 
 .photobooth-exterior {
   position: relative;
@@ -47,6 +51,9 @@ h1 {
   z-index: -1;
 }
 
+#enterBoothButton {
+  z-index: 1; /* ensure it’s above the image */
+}
 
 
 
@@ -63,43 +70,21 @@ h1 {
 }
 
 
-#home {
-  background-color: #ff4d4d;
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
 
-#home:hover {
-  background-color: #e60000;
-}
+/***********************************/
 
-
-
-
-.container {
-  max-width: 800px;
-  width: 95%;
-  background-color: #333;
-  border-radius: 15px;
-  padding: 20px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-  margin: 20px 0;
-  border: 10px solid #222;
-  position: relative;
-}
-
+/* Original CSS continues here */
 .start-screen {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 400px;
+  background-color: #2ecc71;
+  position: relative; /* Allows manipulation of position */
+  top: 100px; /* Example: move the box 100px down */
+  left: 50px; /* Example: move the box 50px from the left */
+  padding: 20px; /* Optional: adds padding inside the box */
 }
 
 .camera-container {
@@ -206,6 +191,7 @@ button:disabled {
   width: 100%;
   height: auto;
   border: 1px solid #ddd;
+  margin: 100px;
 }
 
 .photostrip-branding {
@@ -308,112 +294,32 @@ button:disabled {
 }
 
 #copyright {
-  font-size: 12px;
-  opacity: 0.7;
-  text-align: center;
-  background-color: #8C523B;
-  padding: 20px 0 30px;
-  width: 100%;
-}
-
-
-/* Photostrip printing animation */
-@keyframes slideDown {
-  0% {
-    transform: translateY(-100%);
-    filter: brightness(0);
-  }
-  30% {
-    transform: translateY(0);
-    filter: brightness(0);
-  }
-  100% {
-    transform: translateY(0);
-    filter: brightness(1);
-  }
-}
-
-.photostrip {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  background-color: white;
-  padding: 20px;
-  width: 240px;
-  border-radius: 5px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.5);
-  margin-bottom: 20px;
-  position: relative;
-}
-
-.photostrip.printing {
-  animation: slideDown 3s ease-out forwards;
-}
-
-.photostrip.printing img {
-  opacity: 0;
-  animation: fadeIn 0.5s ease-out forwards;
-}
-
-/* Different delay for each photo to create sequential revealing effect */
-.photostrip.printing img:nth-child(1) {
-  animation-delay: 1.2s;
-}
-
-.photostrip.printing img:nth-child(2) {
-  animation-delay: 1.7s;
-}
-
-.photostrip.printing img:nth-child(3) {
-  animation-delay: 2.2s;
-}
-
-.photostrip.printing img:nth-child(4) {
-  animation-delay: 2.7s;
-}
-
-.photostrip-branding.printing {
-  opacity: 0;
-  animation: fadeIn 0.5s ease-out forwards;
-  animation-delay: 3s;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* Printer sound effect styles */
-.printer-sound {
-  display: none;
-}
-
-/* Printing overlay effect */
-.printing-overlay {
   position: fixed;
-  top: 0;
+  bottom: 0;
   left: 0;
   width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
+  margin-top: 0; /* Remove margin-top */
+  font-size: 12px;
+  opacity: 0.7;
+  text-align: center; /* Center the text */
+  background-color: #8C523B; /* Optional: Add background color to make it stand out */
+  padding-top: 10px; /* Optional: Adjust padding for spacing */
+  padding-bottom: 30px;
+}
+
+
+/* Transition Animation */
+.app-interior,
+.photobooth-exterior {
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.fade-out {
   opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.5s ease;
+  transform: scale(0.9);
 }
 
-.printing-overlay.active {
+.fade-in {
   opacity: 1;
-  pointer-events: auto;
+  transform: scale(1);
 }
-
-.printing-message {
-  font-size: 2rem;
-  color: white;
-  text-align: center;
-  animation: pulse 1.5s infinite;
-}
-
