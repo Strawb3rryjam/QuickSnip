@@ -6,7 +6,7 @@ QuickSnip is a fun and easy photo booth app. Snap pictures, add filters, and sha
 ## ✨ Features
 
 - Live camera feed with photo capture
-- Fun filter effects and overlays
+- Fun stickers and photo strip customization!
 - Instant photo preview and download
 - Responsive design for mobile and desktop
 
@@ -16,15 +16,16 @@ Follow these steps to run SnipSnap locally.
 
 ### ⭐ Clone the repository
 
-1. Open your terminal
-```On Windows, use Command Prompt or PowerShell. On Mac/Linux, use Terminal.
+1. **Open your terminal**  
+   On **Windows**, use Command Prompt or PowerShell. On **Mac/Linux**, use Terminal.
 
-2. Clone the repository
-Run the following command:
-```git clone https://github.com/Strawb3rryjam/QuickSnip.git
+2. **Clone the repository**  
+   Run the following command:
+   ```bash
+   git clone https://github.com/Strawb3rryjam/QuickSnip.git
 
-3. Navigate into the project directory
+3. **Navigate into the project directory**
 ```cd QuickSnip
 
-4. Open project using vs code
-```Code . 
+4. **Open the project using VS Code**
+```code .
