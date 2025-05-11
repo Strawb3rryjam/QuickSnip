@@ -23,9 +23,16 @@ Follow these steps to run SnipSnap locally.
    Run the following command:
    ```bash
    git clone https://github.com/Strawb3rryjam/QuickSnip.git
+   ```
 
-3. **Navigate into the project directory**
-```cd QuickSnip
+3. **Navigate into the project directory**  
+   Run:
+   ```bash
+   cd QuickSnip
+   ```
 
-4. **Open the project using VS Code**
-```code .
+4. **Open the project using VS Code**  
+   Run:
+   ```bash
+   code .
+   ```
