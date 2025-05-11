@@ -16,15 +16,15 @@ Follow these steps to run SnipSnap locally.
 
 ### ⭐ Clone the repository
 
-#### 1. Open your terminal
+1. Open your terminal
 ```On Windows, use Command Prompt or PowerShell. On Mac/Linux, use Terminal.
 
-#### 2. Clone the repository
+2. Clone the repository
 Run the following command:
 ```git clone https://github.com/Strawb3rryjam/QuickSnip.git
 
-#### 3. Navigate into the project directory
+3. Navigate into the project directory
 ```cd QuickSnip
 
-#### 4. Open project using vs code
+4. Open project using vs code
 ```Code . 
