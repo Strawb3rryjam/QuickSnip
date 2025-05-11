@@ -16,7 +16,20 @@ document.addEventListener("DOMContentLoaded", () => {
   const stickerPicker = document.getElementById("stickerPicker");
   const loadingMessage = document.getElementById("loadingMessage");
 
-  // Curtain animation for index.html
+  // Optional navigation buttons (used only on index.html)
+  const photoboothExterior = document.getElementById("photoboothExterior");
+  const appInterior = document.getElementById("appInterior");
+  const enterBoothButton = document.getElementById("enterBoothButton");
+  const exitBoothButton = document.getElementById("exitBoothButton");
+
+  // App State
+  let stream = null;
+  let photosTaken = 0;
+  const maxPhotos = 4;
+  let photoElements = [];
+  let isCountingDown = false;
+
+  // Curtain animation logic
   const curtain = document.getElementById("curtain");
 
   if (curtain) {
@@ -42,13 +55,14 @@ document.addEventListener("DOMContentLoaded", () => {
     curtain.addEventListener("mouseenter", () => animateCurtain(true));
     curtain.addEventListener("mouseleave", () => animateCurtain(false));
 
-    // Navigate to photobooth.html on click
     curtain.addEventListener("click", () => {
       window.location.href = "photobooth.html";
     });
+  } else {
+    console.error("Curtain element not found!");
   }
 
-  // back to home button
+  // Home button navigation
   const homeButton = document.getElementById("home");
   if (homeButton) {
     homeButton.addEventListener("click", () => {
@@ -56,20 +70,18 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Optional navigation buttons (used only in photobooth.html)
-  const photoboothExterior = document.getElementById("photoboothExterior");
-  const appInterior = document.getElementById("appInterior");
-  const enterBoothButton = document.getElementById("enterBoothButton");
-  const exitBoothButton = document.getElementById("exitBoothButton");
-
-  // App State
-  let stream = null;
-  let photosTaken = 0;
-  const maxPhotos = 4;
-  let photoElements = [];
-  let isCountingDown = false;
-
   // Navigation (only if elements exist)
+  function enterBooth() {
+    if (!photoboothExterior || !appInterior) return;
+
+    photoboothExterior.classList.add("hidden");
+    appInterior.classList.add("visible");
+  }
+
+  if (exitBoothButton) {
+    exitBoothButton.addEventListener("click", exitBooth);
+  }
+
   function enterBooth() {
     if (!photoboothExterior || !appInterior) return;
 
@@ -107,11 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 800);
   }
 
-  if (exitBoothButton) {
-    exitBoothButton.addEventListener("click", exitBooth);
-  }
-
-  // Start button
+  // Start button logic
   if (startButton) {
     startButton.addEventListener("click", initCamera);
   }
@@ -337,10 +345,4 @@ document.addEventListener("DOMContentLoaded", () => {
       if (white) white.classList.add("selected");
     }
 
-    photostripContainer.style.display = "none";
-    startScreen.style.display = "flex";
-
-    captureButton.disabled = false;
-    isCountingDown = false;
-  }
-});
+    photostripContainer.style

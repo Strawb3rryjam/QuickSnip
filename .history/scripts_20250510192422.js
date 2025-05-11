@@ -16,7 +16,22 @@ document.addEventListener("DOMContentLoaded", () => {
   const stickerPicker = document.getElementById("stickerPicker");
   const loadingMessage = document.getElementById("loadingMessage");
 
-  // Curtain animation for index.html
+  // Optional navigation buttons (used only on index.html)
+  const photoboothExterior = document.getElementById("photoboothExterior");
+  const appInterior = document.getElementById("appInterior");
+  const enterBoothButton = document.getElementById("enterBoothButton");
+  const exitBoothButton = document.getElementById("exitBoothButton");
+
+  // App State
+  let stream = null;
+  let photosTaken = 0;
+  const maxPhotos = 4;
+  let photoElements = [];
+  let isCountingDown = false;
+
+
+  document.addEventListener("DOMContentLoaded", () => {
+  // DOM Elements
   const curtain = document.getElementById("curtain");
 
   if (curtain) {
@@ -42,10 +57,12 @@ document.addEventListener("DOMContentLoaded", () => {
     curtain.addEventListener("mouseenter", () => animateCurtain(true));
     curtain.addEventListener("mouseleave", () => animateCurtain(false));
 
-    // Navigate to photobooth.html on click
+    // 👉 Navigate to photobooth.html on click
     curtain.addEventListener("click", () => {
       window.location.href = "photobooth.html";
     });
+  } else {
+    console.error("Curtain element not found!");
   }
 
   // back to home button
@@ -56,20 +73,19 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Optional navigation buttons (used only in photobooth.html)
-  const photoboothExterior = document.getElementById("photoboothExterior");
-  const appInterior = document.getElementById("appInterior");
-  const enterBoothButton = document.getElementById("enterBoothButton");
-  const exitBoothButton = document.getElementById("exitBoothButton");
-
-  // App State
-  let stream = null;
-  let photosTaken = 0;
-  const maxPhotos = 4;
-  let photoElements = [];
-  let isCountingDown = false;
 
   // Navigation (only if elements exist)
+  function enterBooth() {
+    if (!photoboothExterior || !appInterior) return;
+
+    photoboothExterior.classList.add("hidden");
+    appInterior.classList.add("visible");
+  }
+
+  if (exitBoothButton) {
+    exitBoothButton.addEventListener("click", exitBooth);
+  }
+
   function enterBooth() {
     if (!photoboothExterior || !appInterior) return;
 
@@ -105,10 +121,6 @@ document.addEventListener("DOMContentLoaded", () => {
         photoboothExterior.classList.remove("fade-out");
       }, 50);
     }, 800);
-  }
-
-  if (exitBoothButton) {
-    exitBoothButton.addEventListener("click", exitBooth);
   }
 
   // Start button

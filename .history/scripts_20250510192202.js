@@ -16,47 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const stickerPicker = document.getElementById("stickerPicker");
   const loadingMessage = document.getElementById("loadingMessage");
 
-  // Curtain animation for index.html
-  const curtain = document.getElementById("curtain");
-
-  if (curtain) {
-    const frames = [
-      "assets/curtain1.svg",
-      "assets/curtain2.svg",
-      "assets/curtain3.svg",
-      "assets/curtain4.svg",
-    ];
-
-    let interval = 0;
-
-    function animateCurtain(forward = true) {
-      let index = forward ? 0 : frames.length - 1;
-      clearInterval(interval);
-      interval = setInterval(() => {
-        curtain.src = frames[index];
-        index = forward ? index + 1 : index - 1;
-        if (index < 0 || index >= frames.length) clearInterval(interval);
-      }, 100);
-    }
-
-    curtain.addEventListener("mouseenter", () => animateCurtain(true));
-    curtain.addEventListener("mouseleave", () => animateCurtain(false));
-
-    // Navigate to photobooth.html on click
-    curtain.addEventListener("click", () => {
-      window.location.href = "photobooth.html";
-    });
-  }
-
-  // back to home button
-  const homeButton = document.getElementById("home");
-  if (homeButton) {
-    homeButton.addEventListener("click", () => {
-      window.location.href = "index.html";
-    });
-  }
-
-  // Optional navigation buttons (used only in photobooth.html)
+  // Optional navigation buttons (used only on index.html)
   const photoboothExterior = document.getElementById("photoboothExterior");
   const appInterior = document.getElementById("appInterior");
   const enterBoothButton = document.getElementById("enterBoothButton");
@@ -70,6 +30,27 @@ document.addEventListener("DOMContentLoaded", () => {
   let isCountingDown = false;
 
   // Navigation (only if elements exist)
+  function enterBooth() {
+    if (!photoboothExterior || !appInterior) return;
+
+    photoboothExterior.classList.add("fade-out");
+
+    // Use setTimeout to allow fade-out transition before hiding the element
+    setTimeout(() => {
+      photoboothExterior.style.display = "none";
+      appInterior.style.display = "block";
+
+      // Wait a bit before starting the fade-in on appInterior
+      setTimeout(() => {
+        appInterior.classList.add("fade-in");
+      }, 50);
+    }, 800); // Adjust timing to match the fade-out duration
+  }
+
+  if (exitBoothButton) {
+    exitBoothButton.addEventListener("click", exitBooth);
+  }
+
   function enterBooth() {
     if (!photoboothExterior || !appInterior) return;
 
@@ -105,10 +86,6 @@ document.addEventListener("DOMContentLoaded", () => {
         photoboothExterior.classList.remove("fade-out");
       }, 50);
     }, 800);
-  }
-
-  if (exitBoothButton) {
-    exitBoothButton.addEventListener("click", exitBooth);
   }
 
   // Start button

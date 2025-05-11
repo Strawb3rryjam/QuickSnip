@@ -1,5 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
   // DOM Elements
+  const photoboothExterior = document.getElementById("photoboothExterior");
+  const appInterior = document.getElementById("appInterior");
+  const enterBoothButton = document.getElementById("enterBoothButton");
+  const exitBoothButton = document.getElementById("exitBoothButton");
+
   const startScreen = document.getElementById("startScreen");
   const cameraContainer = document.getElementById("cameraContainer");
   const camera = document.getElementById("camera");
@@ -16,52 +21,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const stickerPicker = document.getElementById("stickerPicker");
   const loadingMessage = document.getElementById("loadingMessage");
 
-  // Curtain animation for index.html
-  const curtain = document.getElementById("curtain");
-
-  if (curtain) {
-    const frames = [
-      "assets/curtain1.svg",
-      "assets/curtain2.svg",
-      "assets/curtain3.svg",
-      "assets/curtain4.svg",
-    ];
-
-    let interval = 0;
-
-    function animateCurtain(forward = true) {
-      let index = forward ? 0 : frames.length - 1;
-      clearInterval(interval);
-      interval = setInterval(() => {
-        curtain.src = frames[index];
-        index = forward ? index + 1 : index - 1;
-        if (index < 0 || index >= frames.length) clearInterval(interval);
-      }, 100);
-    }
-
-    curtain.addEventListener("mouseenter", () => animateCurtain(true));
-    curtain.addEventListener("mouseleave", () => animateCurtain(false));
-
-    // Navigate to photobooth.html on click
-    curtain.addEventListener("click", () => {
-      window.location.href = "photobooth.html";
-    });
-  }
-
-  // back to home button
-  const homeButton = document.getElementById("home");
-  if (homeButton) {
-    homeButton.addEventListener("click", () => {
-      window.location.href = "index.html";
-    });
-  }
-
-  // Optional navigation buttons (used only in photobooth.html)
-  const photoboothExterior = document.getElementById("photoboothExterior");
-  const appInterior = document.getElementById("appInterior");
-  const enterBoothButton = document.getElementById("enterBoothButton");
-  const exitBoothButton = document.getElementById("exitBoothButton");
-
   // App State
   let stream = null;
   let photosTaken = 0;
@@ -69,25 +28,28 @@ document.addEventListener("DOMContentLoaded", () => {
   let photoElements = [];
   let isCountingDown = false;
 
-  // Navigation (only if elements exist)
-  function enterBooth() {
-    if (!photoboothExterior || !appInterior) return;
+  // Photobooth navigation
+  enterBoothButton.addEventListener("click", enterBooth);
+  exitBoothButton.addEventListener("click", exitBooth);
 
+  // Enter the photobooth
+  function enterBooth() {
     photoboothExterior.classList.add("fade-out");
 
     setTimeout(() => {
       photoboothExterior.style.display = "none";
       appInterior.style.display = "block";
 
+      // Allow time for DOM update before adding the fade-in class
       setTimeout(() => {
         appInterior.classList.add("fade-in");
       }, 50);
     }, 800);
   }
 
+  // Exit the photobooth
   function exitBooth() {
-    if (!appInterior || !photoboothExterior) return;
-
+    // Stop camera if running
     if (stream) {
       stream.getTracks().forEach((track) => track.stop());
       stream = null;
@@ -101,21 +63,17 @@ document.addEventListener("DOMContentLoaded", () => {
       resetPhotobooth();
 
       photoboothExterior.style.display = "flex";
+      // Allow time for DOM update before adding the fade-in class
       setTimeout(() => {
         photoboothExterior.classList.remove("fade-out");
       }, 50);
     }, 800);
   }
 
-  if (exitBoothButton) {
-    exitBoothButton.addEventListener("click", exitBooth);
-  }
+  // Start the photobooth
+  startButton.addEventListener("click", initCamera);
 
-  // Start button
-  if (startButton) {
-    startButton.addEventListener("click", initCamera);
-  }
-
+  // Initialize the camera
   async function initCamera() {
     startScreen.style.display = "none";
     cameraContainer.style.display = "block";
@@ -140,6 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // Start the photo taking sequence
   function startPhotoSequence() {
     if (isCountingDown) return;
 
@@ -148,6 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
     startCountdown();
   }
 
+  // Display countdown before taking photo
   function startCountdown() {
     let count = 3;
     countdown.textContent = count;
@@ -166,90 +126,108 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 1000);
   }
 
+  // Take a photo
   function takePhoto() {
-    if (!camera || photosTaken >= maxPhotos) return;
-
+    // Create flash effect
     flash.style.opacity = "0.8";
     setTimeout(() => {
       flash.style.opacity = "0";
     }, 100);
 
+    // Create the canvas to capture the photo
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("2d");
 
+    // Set canvas dimensions to match the video
     canvas.width = camera.videoWidth;
     canvas.height = camera.videoHeight;
 
+    // Draw the video frame on the canvas, flip horizontally
     context.translate(canvas.width, 0);
     context.scale(-1, 1);
     context.drawImage(camera, 0, 0, canvas.width, canvas.height);
 
+    // Convert canvas to image
     const imgUrl = canvas.toDataURL("image/jpeg");
 
+    // Add to photostrip
     photosTaken++;
     const photoElement = document.createElement("img");
     photoElement.src = imgUrl;
     photoElement.alt = `Photo ${photosTaken}`;
     photoElements.push(photoElement);
 
+    // Check if we need to take more photos
     if (photosTaken < maxPhotos) {
+      // Wait before next photo
       setTimeout(() => {
         isCountingDown = false;
         startCountdown();
       }, 1000);
     } else {
+      // We're done taking photos
       finishPhotoSession();
     }
   }
 
+  // Finish photo session and show the photostrip
   function finishPhotoSession() {
+    // Stop camera
     if (stream) {
       stream.getTracks().forEach((track) => track.stop());
       stream = null;
     }
 
+    // Hide camera UI
     cameraContainer.style.display = "none";
     cameraControls.style.display = "none";
 
+    // Add photos to photostrip
     for (let i = 0; i < photoElements.length; i++) {
       photostrip.appendChild(photoElements[i]);
     }
 
+    // Show photostrip editor
     photostripContainer.style.display = "flex";
+
+    // Initialize the editing tools
     initEditingTools();
   }
 
+  // Initialize editing tools for photostrip
   function initEditingTools() {
-    if (colorPicker) {
-      colorPicker.querySelectorAll(".color").forEach((colorEl) => {
-        colorEl.addEventListener("click", () => {
-          colorPicker
-            .querySelectorAll(".color")
-            .forEach((el) => el.classList.remove("selected"));
-          colorEl.classList.add("selected");
-          const selectedColor = colorEl.getAttribute("data-color");
-          photostrip.style.backgroundColor = selectedColor;
+    // Color picker functionality
+    colorPicker.querySelectorAll(".color").forEach((colorEl) => {
+      colorEl.addEventListener("click", () => {
+        // Remove selected class from all colors
+        colorPicker.querySelectorAll(".color").forEach((el) => {
+          el.classList.remove("selected");
         });
+
+        // Add selected class to clicked color
+        colorEl.classList.add("selected");
+
+        // Apply color to photostrip
+        const selectedColor = colorEl.getAttribute("data-color");
+        photostrip.style.backgroundColor = selectedColor;
       });
-    }
+    });
 
-    if (stickerPicker) {
-      stickerPicker.querySelectorAll(".sticker").forEach((stickerEl) => {
-        stickerEl.addEventListener("click", () => {
-          addSticker(stickerEl.textContent);
-        });
+    // Sticker functionality
+    stickerPicker.querySelectorAll(".sticker").forEach((stickerEl) => {
+      stickerEl.addEventListener("click", () => {
+        addSticker(stickerEl.textContent);
       });
-    }
+    });
 
-    if (downloadButton) {
-      downloadButton.addEventListener("click", downloadPhotostrip);
-    }
+    // Download button
+    downloadButton.addEventListener("click", downloadPhotostrip);
 
-    if (resetButton) {
-      resetButton.addEventListener("click", resetPhotobooth);
-    }
+    // Reset button
+    resetButton.addEventListener("click", resetPhotobooth);
   }
 
+  // Add a draggable sticker to the photostrip
   function addSticker(emoji) {
     const sticker = document.createElement("div");
     sticker.classList.add("draggable-sticker");
@@ -259,6 +237,7 @@ document.addEventListener("DOMContentLoaded", () => {
     sticker.style.transform = "translate(-50%, -50%)";
     photostrip.appendChild(sticker);
 
+    // Make sticker draggable
     let isDragging = false;
     let offsetX, offsetY;
 
@@ -272,9 +251,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.addEventListener("mousemove", (e) => {
       if (!isDragging) return;
+
       const photoRect = photostrip.getBoundingClientRect();
-      sticker.style.left = `${e.clientX - photoRect.left - offsetX}px`;
-      sticker.style.top = `${e.clientY - photoRect.top - offsetY}px`;
+      const x = e.clientX - photoRect.left - offsetX;
+      const y = e.clientY - photoRect.top - offsetY;
+
+      sticker.style.left = `${x}px`;
+      sticker.style.top = `${y}px`;
       sticker.style.transform = "none";
     });
 
@@ -283,6 +266,7 @@ document.addEventListener("DOMContentLoaded", () => {
       sticker.style.zIndex = "999";
     });
 
+    // Touch support for mobile
     sticker.addEventListener("touchstart", (e) => {
       isDragging = true;
       const touch = e.touches[0];
@@ -295,10 +279,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.addEventListener("touchmove", (e) => {
       if (!isDragging) return;
+
       const touch = e.touches[0];
       const photoRect = photostrip.getBoundingClientRect();
-      sticker.style.left = `${touch.clientX - photoRect.left - offsetX}px`;
-      sticker.style.top = `${touch.clientY - photoRect.top - offsetY}px`;
+      const x = touch.clientX - photoRect.left - offsetX;
+      const y = touch.clientY - photoRect.top - offsetY;
+
+      sticker.style.left = `${x}px`;
+      sticker.style.top = `${y}px`;
       sticker.style.transform = "none";
       e.preventDefault();
     });
@@ -309,6 +297,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Download the photostrip
   function downloadPhotostrip() {
     html2canvas(photostrip).then((canvas) => {
       const link = document.createElement("a");
@@ -318,28 +307,31 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Reset the photobooth to start again
   function resetPhotobooth() {
+    // Reset counters and arrays
     photosTaken = 0;
     photoElements = [];
 
+    // Clear the photostrip
     const photos = photostrip.querySelectorAll("img");
     const stickers = photostrip.querySelectorAll(".draggable-sticker");
 
     photos.forEach((photo) => photo.remove());
     stickers.forEach((sticker) => sticker.remove());
 
+    // Reset photostrip color
     photostrip.style.backgroundColor = "white";
-    if (colorPicker) {
-      colorPicker
-        .querySelectorAll(".color")
-        .forEach((el) => el.classList.remove("selected"));
-      const white = colorPicker.querySelector('[data-color="white"]');
-      if (white) white.classList.add("selected");
-    }
+    colorPicker.querySelectorAll(".color").forEach((el) => {
+      el.classList.remove("selected");
+    });
+    colorPicker.querySelector('[data-color="white"]').classList.add("selected");
 
+    // Hide photostrip and show start screen
     photostripContainer.style.display = "none";
     startScreen.style.display = "flex";
 
+    // Reset buttons
     captureButton.disabled = false;
     isCountingDown = false;
   }
