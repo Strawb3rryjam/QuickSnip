@@ -1,6 +1,6 @@
 ﻿# 📸 QuickSnip - A Modern Photobooth App
 
-QuickSnip is a fun and easy photo booth app. Snap pictures, add filters, and share your memories right from your browser.
+QuickSnip is a fun and easy photo booth app. Quickly snap pictures, add filters, and share your memories right from your browser.
 
 
 ## ✨ Features
@@ -12,7 +12,7 @@ QuickSnip is a fun and easy photo booth app. Snap pictures, add filters, and sha
 
 ## 🚀 Getting Started
 
-Follow these steps to run SnipSnap locally.
+Follow these steps to run QuickSnip locally
 
 ### ⭐ Clone the repository
 
